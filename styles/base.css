@@ -79,7 +79,7 @@ label[for='theme-switch-checkbox']
 
 #twiddle-gameboard
 {
-    margin-bottom: 4rem;
+    margin-bottom: 1rem;
 }
 
 @keyframes tileEnterAnimation
