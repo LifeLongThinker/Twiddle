@@ -1,0 +1,11 @@
+:root 
+{
+    --background-color: #333;
+    --tile-background-color: #444;
+    --tile-text-color: #fff;
+    --tile-border-color: #555;
+    --key-background-color: #cdcdcd;
+    --key-pressed-background-color: #aaa;
+    --state-miss-background-color: #222;
+    --theme-switch-text-color: #fff;
+}

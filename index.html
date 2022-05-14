@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en" data-theme="">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <title>Twiddle (Wordle Clone)</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"
+          integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g==" 
+          crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="styles/base.css" rel="stylesheet" />
+    <script src="twiddle.js" defer></script>
+</head>
+
+<body>
+    <div id="alert-backdrop">
+        <div id="alert-message">Welcome!</div>
+    </div>
+
+    <div id="theme-switch-panel">
+        <input type="checkbox" id="theme-switch-checkbox" />
+        <label for="theme-switch-checkbox"><i class="fa-solid fa-sun"></i></label>
+    </div>
+
+    <div id="twiddle-gameboard"></div>
+    <div id="twiddle-keyboard"></div>
+</body>
+</html>
