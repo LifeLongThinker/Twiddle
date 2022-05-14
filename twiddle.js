@@ -556,12 +556,12 @@ class Dictionary
 }
 class GameOptions
 {
-    static DEFAULT_MAX_ATTEMPS = 6;
-
     constructor(dictionary, maxAttempts)
     {
+        const DEFAULT_MAX_ATTEMPTS = 6;
+        
         this.dictionary = dictionary;
-        this.maxAttempts = maxAttempts ?? GameOptions.DEFAULT_MAX_ATTEMPS;
+        this.maxAttempts = maxAttempts ?? DEFAULT_MAX_ATTEMPTS;
     }
 
     get wordLength()
