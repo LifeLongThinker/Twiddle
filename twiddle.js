@@ -180,14 +180,14 @@ class KeyChar
         return this.char == KeyChars.Enter.char;
     }
 }
-class KeyChars
+const KeyChars =
 {
-    static Enter = new KeyChar("↵");
-    static Backspace = new KeyChar("←");
+    Enter: new KeyChar("↵"),
+    Backspace: new KeyChar("←")
 }
-class KeyEvents
+const KeyEvents =
 {
-    static KeyPressed = "KeyPressed";
+    KeyPressed: "KeyPressed"
 }
 class Key extends EventEmitter
 {
@@ -234,7 +234,8 @@ class Key extends EventEmitter
         this.emit(KeyEvents.KeyPressed, this);
     }
 }
-const KeyBoardEvents = {
+const KeyBoardEvents =
+{
     KeyPressed: "KeyPressed"
 }
 class KeyBoard extends EventEmitter
@@ -575,7 +576,7 @@ class Game
         this.options = options ?? GameOptions.default;
         this.attempts = [];
         this.activeAttemptIndex = 0;
-        
+
         this.initializeNewGame();
     }
 
