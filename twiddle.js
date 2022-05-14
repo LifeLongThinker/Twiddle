@@ -58,9 +58,18 @@ class EventEmitter
 // THEME
 class Theme
 {
+    static get light()
+    {
+        return 'light';
+    }
+    static get dark()
+    {
+        return 'dark';
+    }
+
     static restoreFromUserPreferences()
     {
-        const theme = UserPreferences.tryGet(UserPreferencesKeys.Theme, 'dark');
+        const theme = UserPreferences.tryGet(UserPreferencesKeys.Theme, Theme.dark);
         this.set(theme);
     }
     
@@ -76,22 +85,19 @@ class Theme
 }
 class ThemeCheckbox
 {
-    #hostElement = null;
-    
     constructor(hostElement)
     {
-        this.#hostElement = hostElement;
-        this.#hostElement.addEventListener('change', this.#onCheckboxChange, false);
+        this.hostElement = hostElement;
+        this.hostElement.addEventListener('change', this.onCheckboxChange, false);
     }
 
     restoreFromUserPreferences()
     {
-        this.#hostElement.checked = (Theme.get() == Theme.LIGHT);
+        this.hostElement.checked = (Theme.get() == Theme.light);
     }
-
-    #onCheckboxChange(e)
+    onCheckboxChange(e)
     {
-        const theme = e.target.checked ? Theme.LIGHT : Theme.DARK;
+        const theme = e.target.checked ? Theme.light : Theme.dark;
         Theme.set(theme);
     }
 }
@@ -99,50 +105,45 @@ class ThemeCheckbox
 // ALERT
 class Alert
 {
-    #hostElement;
-    #alertMessageElement;
-    #timeoutHandler;
-
     constructor(hostElement)
     {
-        this.#hostElement = hostElement;
-        this.#alertMessageElement = document.getElementById('alert-message');
+        this.hostElement = hostElement;
+        this.alertMessageElement = document.getElementById('alert-message');
 
-        this.#hostElement.addEventListener('click', (e) => { this.hide() });
+        this.hostElement.addEventListener('click', (e) => { this.hide() });
     }
     
     show(message, timeoutMs)
     {
-        this.#setMessage(message);
-        this.#setVisible(true);
-        this.#resetTimeout(timeoutMs);
+        this.setMessage(message);
+        this.setVisible(true);
+        this.resetTimeout(timeoutMs);
     }
     hide()
     {
-        this.#setVisible(false);
+        this.setVisible(false);
     }
-
-    #setMessage(message)
+    setMessage(message)
     {
-        this.#alertMessageElement.innerText = message;
+        this.alertMessageElement.innerText = message;
     }
-    #setVisible(visible)
+    setVisible(visible)
     {
         if(visible)
         {
-            this.#hostElement.classList.add('visible');
+            this.hostElement.classList.add('visible');
         }
         else
         {
-            this.#hostElement.classList.remove('visible');
+            this.hostElement.classList.remove('visible');
         }
     }
-    #resetTimeout(timeoutMs)
+    resetTimeout(timeoutMs)
     {
         // clear previous timeout
-        if(this.#timeoutHandler)
+        if(this.timeoutHandler)
         {
-            clearTimeout(this.#timeoutHandler);
+            clearTimeout(this.timeoutHandler);
         }
         
         if(!timeoutMs)
@@ -151,8 +152,8 @@ class Alert
         }
 
         // set new timeout
-        this.#timeoutHandler = setTimeout(() => {
-            this.#setMessage("");
+        this.timeoutHandler = setTimeout(() => {
+            this.setMessage("");
             this.hide();
         }, timeoutMs);
     }
@@ -190,28 +191,26 @@ class KeyEvents
 }
 class Key extends EventEmitter
 {
-    #hostElement = null;
-
     constructor(hostElement, keyChar)
     {
         super();
 
-        this.#hostElement = hostElement;
-        this.#hostElement.textContent = keyChar.char;
-        this.#hostElement.addEventListener('click', this.#onButtonClick.bind(this));
+        this.hostElement = hostElement;
+        this.hostElement.textContent = keyChar.char;
+        this.hostElement.addEventListener('click', this.onButtonClick.bind(this));
 
         if(keyChar.isSpecialChar)
         {
-            this.#hostElement.classList.add('special');
+            this.hostElement.classList.add('special');
 
             // TODO: use polymorphism to make this open/closed-compatible
             if(keyChar.isBackspace)
             {
-                this.#hostElement.innerHTML = '<i class="fa-solid fa-delete-left"></i>';
+                this.hostElement.innerHTML = '<i class="fa-solid fa-delete-left"></i>';
             }
             else if(keyChar.isEnter)
             {
-                this.#hostElement.innerHTML = '<i class="fa-solid fa-square-check"></i>';
+                this.hostElement.innerHTML = '<i class="fa-solid fa-square-check"></i>';
             }
         }
 
@@ -228,10 +227,9 @@ class Key extends EventEmitter
 
     setState(charState)
     {
-        this.#hostElement.classList.add(`state-${charState.toLowerCase()}`);
+        this.hostElement.classList.add(`state-${charState.toLowerCase()}`);
     }
-
-    #onButtonClick()
+    onButtonClick()
     {
         this.emit(KeyEvents.KeyPressed, this);
     }
@@ -241,15 +239,14 @@ const KeyBoardEvents = {
 }
 class KeyBoard extends EventEmitter
 {
-    #keysByChars = {};
-
     constructor(hostElement)
     {
         super();
 
         this.hostElement = hostElement;
+        this.keysByChars = {};
 
-        this.#instantiateRowsOfKeys();
+        this.instantiateRowsOfKeys();
     }
     
     setKeyStates(word, charStates)
@@ -257,32 +254,31 @@ class KeyBoard extends EventEmitter
         for(var i = 0; i < word.length; i++)
         {
             const char = word[i];
-            this.#keysByChars[char].setState(charStates[i]);
+            this.keysByChars[char].setState(charStates[i]);
         }
     }
-
-    #instantiateRowsOfKeys()
+    instantiateRowsOfKeys()
     {
-        this.#instantiateRowOfKeys("qwertyuiop");
-        this.#instantiateRowOfKeys("asdfghjkl");
-        this.#instantiateRowOfKeys(`${KeyChars.Enter.char}zxcvbnm${KeyChars.Backspace.char}`)
+        this.instantiateRowOfKeys("qwertyuiop");
+        this.instantiateRowOfKeys("asdfghjkl");
+        this.instantiateRowOfKeys(`${KeyChars.Enter.char}zxcvbnm${KeyChars.Backspace.char}`)
     }
-    #instantiateRowOfKeys(chars)
+    instantiateRowOfKeys(chars)
     {
         const rowElement = document.createElement("div");
         rowElement.classList.add("row");
         this.hostElement.append(rowElement);
 
-        chars.toLowerCase().split("").map(char => this.#instantiateKey(rowElement, new KeyChar(char)));
+        chars.toLowerCase().split("").map(char => this.instantiateKey(rowElement, new KeyChar(char)));
     }
-    #instantiateKey(rowElement, keyChar)
+    instantiateKey(rowElement, keyChar)
     {
         let newKey = Key.insertKeyInRow(rowElement, keyChar);
-        this.#keysByChars[keyChar.char] = newKey;
+        this.keysByChars[keyChar.char] = newKey;
 
-        newKey.addEventListener(KeyEvents.KeyPressed, this.#onKeyPressed.bind(this));
+        newKey.addEventListener(KeyEvents.KeyPressed, this.onKeyPressed.bind(this));
     }
-    #onKeyPressed(keyChar)
+    onKeyPressed(keyChar)
     {
         this.emit(KeyBoardEvents.KeyPressed, keyChar);
     }
@@ -291,44 +287,37 @@ class KeyBoard extends EventEmitter
 // GAME BOARD
 class GameBoard
 {
-    #rows = [];
-
     constructor(hostElement, gameOptions)
     {
         this.hostElement = hostElement;
         this.gameOptions = gameOptions;
-
-        this.#rows = this.#instantiateRowsOfTiles(gameOptions.maxAttempts);
+        this.rows = this.instantiateRowsOfTiles(gameOptions.maxAttempts);
     }
 
     insertCharAt(rowIndex, char)
     {
-        this.#rows[rowIndex].insertChar(char);
+        this.rows[rowIndex].insertChar(char);
     }
     removeCharFrom(rowIndex)
     {
-        this.#rows[rowIndex].removeChar();
+        this.rows[rowIndex].removeChar();
     }
     setRowState(rowIndex, charStates)
     {
-        const row = this.#rows[rowIndex];
+        const row = this.rows[rowIndex];
         row.setState(charStates);
     }
-
-    #instantiateRowsOfTiles(rows)
+    instantiateRowsOfTiles(rows)
     {
         return Array.from({length: rows}, (x, i) => TileRow.insertTileRowIntoBoard(this.hostElement, this.gameOptions));
     }
 }
 class TileRow
 {
-    #tiles = [];
-
     constructor(hostElement, gameOptions)
     {
         this.hostElement = hostElement;
-
-        this.#tiles = this.#insertTilesIntoRow(gameOptions.wordLength);
+        this.tiles = this.insertTilesIntoRow(gameOptions.wordLength);
     }
 
     static insertTileRowIntoBoard(gameBoardElement, gameOptions)
@@ -342,34 +331,31 @@ class TileRow
 
     insertChar(char)
     {
-        const firstEmptyTile = this.#tiles.find((t, i) => !t.hasChar);
+        const firstEmptyTile = this.tiles.find((t, i) => !t.hasChar);
         firstEmptyTile.char = char;
     }
     removeChar()
     {
-        const lastNonEmptyTile = this.#tiles.slice().reverse().find((t, i) => t.hasChar);
+        const lastNonEmptyTile = this.tiles.slice().reverse().find((t, i) => t.hasChar);
         lastNonEmptyTile.char = null;
     }
     setState(charStates)
     {
         for(var i = 0; i < charStates.length; i++)
         {
-            this.#tiles[i].setState(charStates[i]);
+            this.tiles[i].setState(charStates[i]);
         }
     }
-
-    #insertTilesIntoRow(wordLength)
+    insertTilesIntoRow(wordLength)
     {
         return Array.from({ length: wordLength }, (x, i) => Tile.insertTileIntoRow(this.hostElement));
     }
 }
 class Tile
 {
-    #hostElement = null;
-
     constructor(hostElement)
     {
-        this.#hostElement = hostElement;
+        this.hostElement = hostElement;
     }
 
     static insertTileIntoRow(tileRowElement)
@@ -387,7 +373,7 @@ class Tile
     }
     get char()
     {
-        return (this.#hostElement.textContent ?? "").split("")[0];
+        return (this.hostElement.textContent ?? "").split("")[0];
     }
     set char(value)
     {
@@ -398,18 +384,18 @@ class Tile
             throw new Error("Invalid value");
         }
 
-        this.#hostElement.textContent = value.split("")[0];
-        this.#hostElement.classList.remove('has-char');
+        this.hostElement.textContent = value.split("")[0];
+        this.hostElement.classList.remove('has-char');
 
         if(this.hasChar)
         {
-            this.#hostElement.classList.add('has-char');
+            this.hostElement.classList.add('has-char');
         }
     }
 
     setState(charState)
     {
-        this.#hostElement.classList.toggle(`state-${charState.toLowerCase()}`);
+        this.hostElement.classList.toggle(`state-${charState.toLowerCase()}`);
     }
     clear()
     {
@@ -427,46 +413,27 @@ const CharStates = {
 }
 class Attempt
 {
-    #options = null;
-    #isValidated = false;
-    #word = "";
-    #index = 0;
-    #charStates = [];
-
     constructor(gameOptions, index)
     {
-        this.#options = gameOptions;
-        this.#index = index;
+        this.options = gameOptions;
+        this.index = index;
+        this.isValidated = false;
+        this.word = "";
+        this.charStates = [];
     }
 
-    get index()
-    {
-        return this.#index;
-    }
-    get word()
-    {
-        return this.#word;
-    }
     get isFull()
     {
-        return this.#word.length == this.#options.wordLength;
+        return this.word.length == this.options.wordLength;
     }
     get isEmpty()
     {
-        return !this.#word;
-    }
-    get isValidated()
-    {
-        return this.#isValidated;
-    }
-    get charStates()
-    {
-        return this.#charStates;
+        return !this.word;
     }
     get isCorrect()
     {
-        return this.#charStates.length == this.#options.wordLength
-            && this.#charStates.every((c, i) => c == CharStates.Correct);
+        return this.charStates.length == this.options.wordLength
+            && this.charStates.every((c, i) => c == CharStates.Correct);
     }
 
     add(keyChar)
@@ -476,7 +443,7 @@ class Attempt
             return;
         }
 
-        this.#word += keyChar.char;
+        this.word += keyChar.char;
     }
     removeLastChar()
     {
@@ -485,7 +452,7 @@ class Attempt
             throw new Error("Row empty");
         }
 
-        this.#word = this.#word.substring(0, this.#word.length - 1);
+        this.word = this.word.substring(0, this.word.length - 1);
     }
     validate(solution)
     {
@@ -494,11 +461,10 @@ class Attempt
             throw new Error("Attempt is not full.");
         }
         
-        this.#charStates = this.#compareWordWithSolution(solution);
-        this.#isValidated = true;
+        this.charStates = this.compareWordWithSolution(solution);
+        this.isValidated = true;
     }
-
-    #compareWordWithSolution(solution)
+    compareWordWithSolution(solution)
     {
         const charStates = [];
 
@@ -526,12 +492,12 @@ class Attempt
 }
 class Dictionary
 {
-    #wordLength = null;
-    #entries = {};
-
     constructor(data)
     {
-        this.#loadEntriesFromData(data);
+        this.entries = {};
+        this.wordLength = null;
+
+        this.loadEntriesFromData(data);
     }
 
     static loadFromUrl(url)
@@ -544,31 +510,26 @@ class Dictionary
             .catch((error) => console.error("Failed to download dictionary", error));
     }
 
-    get wordLength()
-    {
-        return this.#wordLength;
-    }
-
     add(entry)
     {
         // normalize
         entry = entry.trim();
 
-        this.#validateWordLength(entry);
-        Object.defineProperty(this.#entries, entry, { writable: false });
+        this.validateWordLength(entry);
+        Object.defineProperty(this.entries, entry, { writable: false });
     }
     pickRandomEntry()
     {
-        const entries = Object.getOwnPropertyNames(this.#entries);
+        const entries = Object.getOwnPropertyNames(this.entries);
         const rndInt = Math.floor(Math.random() * entries.length);
         return entries[rndInt];
     }
     contains(entry)
     {
-        return this.#entries.hasOwnProperty(entry);
+        return this.entries.hasOwnProperty(entry);
     }
 
-    #loadEntriesFromData(data)
+    loadEntriesFromData(data)
     {
         const entries = data.split('\n');
 
@@ -577,18 +538,18 @@ class Dictionary
             this.add(entry);
         }
     }
-    #validateWordLength(entry)
+    validateWordLength(entry)
     {
-        if(!this.#wordLength)
+        if(!this.wordLength)
         {
-            this.#wordLength = entry.length;
+            this.wordLength = entry.length;
             return;
         }
 
-        if(entry.length != this.#wordLength)
+        if(entry.length != this.wordLength)
         {
             console.log('invalid entry', entry);
-            throw new Error(`Invalid entry: '${entry}'. Expected a word length of ${this.#wordLength}.`);
+            throw new Error(`Invalid entry: '${entry}'. Expected a word length of ${this.wordLength}.`);
         }
     }
 }
@@ -609,33 +570,28 @@ class GameOptions
 }
 class Game
 {
-    #attempts = [];
-    #activeAttemptIndex = 0;
-    #solution = null;
-
     constructor(options)
     {
         this.options = options ?? GameOptions.default;
-        this.#initializeNewGame();
+        this.attempts = [];
+        this.activeAttemptIndex = 0;
+        
+        this.initializeNewGame();
     }
 
     get activeAttempt()
     {
-        return this.#attempts[this.#activeAttemptIndex];
+        return this.attempts[this.activeAttemptIndex];
     }
     get isLastAttempt()
     {
-        return this.#activeAttemptIndex == this.options.maxAttempts - 1;
+        return this.activeAttemptIndex == this.options.maxAttempts - 1;
     }
     get isFinished()
     {
         return (this.activeAttempt.isCorrect)
             || (   this.isLastAttempt
                 && this.activeAttempt.isValidated);
-    }
-    get solution()
-    {
-        return this.#solution;
     }
 
     // USER INPUT ACTIVITY
@@ -649,7 +605,7 @@ class Game
         {
             if(keyChar.isEnter)
             {
-                return this.#validateActiveAttempt();
+                return this.validateActiveAttempt();
             }
             else if(keyChar.isBackspace)
             {
@@ -685,33 +641,33 @@ class Game
     }
 
     // VALIDATE ATTEMPT ACTIVITY
-    #validateActiveAttempt()
+    validateActiveAttempt()
     {
         if(!this.options.dictionary.contains(this.activeAttempt.word))
         {
             return new InvalidAttempt();
         }
 
-        this.activeAttempt.validate(this.#solution);
+        this.activeAttempt.validate(this.solution);
         const newState = new AttemptValidated(this, this.activeAttempt);
 
         if(   !this.activeAttempt.isCorrect
            && !this.isLastAttempt)
         {
             // proceed to next attempt
-            this.#activateNextAttempt();
+            this.activateNextAttempt();
         }
 
         return newState;
     }
-    #activateNextAttempt()
+    activateNextAttempt()
     {
-        this.#activeAttemptIndex++;
+        this.activeAttemptIndex++;
     }
-    #initializeNewGame()
+    initializeNewGame()
     {
-        this.#solution = this.options.dictionary.pickRandomEntry();
-        this.#attempts = Array.from( { length: this.options.maxAttempts }, (x, i) => new Attempt(this.options, i));
+        this.solution = this.options.dictionary.pickRandomEntry();
+        this.attempts = Array.from( { length: this.options.maxAttempts }, (x, i) => new Attempt(this.options, i));
     }
 }
 class GameStateChange
