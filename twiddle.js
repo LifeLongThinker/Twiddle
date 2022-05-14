@@ -1,14 +1,23 @@
 /**
  * CORE
  */
+const UserPreferencesKeys = {
+    Theme: 'theme'
+}
 class UserPreferences
 {
-    static THEME = 'theme';
-    
     static tryGet(key, defaultTo)
     {
-        const storedValue = localStorage.getItem(key);
-        return storedValue ?? defaultTo;
+        try
+        {
+            const storedValue = localStorage.getItem(key);
+            return storedValue ?? defaultTo;
+        }
+        catch(error)
+        {
+            console.error(error);
+            return defaultTo;
+        }
     }
     static set(key, value)
     {
@@ -49,32 +58,26 @@ class EventEmitter
 // THEME
 class Theme
 {
-    static #DATA_KEY = "data-theme";
-    static #DEFAULT_THEME_VALUE = Theme.DARK;
-
-    static DARK = "dark";
-    static LIGHT = "light";
-
     static restoreFromUserPreferences()
     {
-        const theme = UserPreferences.tryGet(UserPreferences.THEME, Theme.#DEFAULT_THEME_VALUE);
+        const theme = UserPreferences.tryGet(UserPreferencesKeys.Theme, 'dark');
         this.set(theme);
     }
     
     static get()
     {
-        return document.documentElement.getAttribute(Theme.#DATA_KEY);
+        return document.documentElement.getAttribute('data-theme');
     }
     static set(theme)
     {
-        document.documentElement.setAttribute(Theme.#DATA_KEY, theme);
-        UserPreferences.set(UserPreferences.THEME, theme);
+        document.documentElement.setAttribute('data-theme', theme);
+        UserPreferences.set(UserPreferencesKeys.Theme, theme);
     }
 }
 class ThemeCheckbox
 {
     #hostElement = null;
-
+    
     constructor(hostElement)
     {
         this.#hostElement = hostElement;
@@ -233,9 +236,8 @@ class Key extends EventEmitter
         this.emit(KeyEvents.KeyPressed, this);
     }
 }
-class KeyBoardEvents
-{
-    static KeyPressed = "KeyPressed";
+const KeyBoardEvents = {
+    KeyPressed: "KeyPressed"
 }
 class KeyBoard extends EventEmitter
 {
