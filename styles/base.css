@@ -63,10 +63,12 @@ label[for='theme-switch-checkbox']
     min-width: 2rem;
     height: 3.6rem;
     margin: .2rem;
+    padding: 0;
     border-radius: .4rem;
     text-transform: uppercase;
     border: none;
     background-color: var(--key-background-color);
+    touch-action: manipulation; /* disable double tap zoom on ios (safari) */
 }
 
 #twiddle-keyboard .row button:active
