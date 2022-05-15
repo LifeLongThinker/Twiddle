@@ -366,7 +366,6 @@ class TileRow
     {
         const indexOfFirstTileWithoutChar = this.tiles.findIndex(t => !t.hasChar);
         this.tiles.map((t, i) => t.inputFocus = indexOfFirstTileWithoutChar == i);
-        console.log(indexOfFirstTileWithoutChar, this);
     }
     insertTilesIntoRow(wordLength)
     {
@@ -842,4 +841,5 @@ Dictionary.loadFromUrl('./res/words5.txt')
         alert.hide();
     });
 
-console.debug('Twiddle loaded.');
+const version = '1.04'
+console.debug(`Twiddle v${version} loaded.`);

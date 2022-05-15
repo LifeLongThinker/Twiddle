@@ -5,6 +5,7 @@ html
 {
     font-family: sans-serif;
     background-color: var(--background-color);
+    box-sizing: border-box;
 }
 
 /* ALERT */
@@ -33,10 +34,14 @@ html
     justify-content: center;
     color: #fff;
     font-size: 1.2rem;
-    width: 30rem;
+    max-width: 30rem;
+    min-width: 10rem;
     height: 12rem;
-    background: rgba(0, 0, 0, .6);
+    background: rgba(0, 0, 0, .8);
     border-radius: 2rem;
+    padding: 1rem;
+    margin: .4rem;
+    text-align: center;
 }
 
 /* THEME SWITCHER */
