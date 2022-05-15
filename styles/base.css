@@ -119,6 +119,25 @@ label[for='theme-switch-checkbox']
     line-height: 4rem;
 }
 
+@keyframes tileCursorBlinkAnimation
+{
+    from
+    {
+        border-bottom-color: transparent;
+    }
+
+    to
+    {
+        border-bottom-color: var(--tile-cursor-color);
+    }
+}
+
+#twiddle-gameboard .row .tile.input-focus
+{
+    border-bottom: 3px solid var(--tile-border-color);
+    animation: tileCursorBlinkAnimation 1s steps(2, start) infinite;
+}
+
 #twiddle-gameboard .row .tile.has-char
 {
     animation-duration: .4s;

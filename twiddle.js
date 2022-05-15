@@ -293,11 +293,16 @@ class GameBoard
         this.hostElement = hostElement;
         this.gameOptions = gameOptions;
         this.rows = this.instantiateRowsOfTiles(gameOptions.maxAttempts);
+        this.rows[0].updateInputFocus();
     }
 
     insertCharAt(rowIndex, char)
     {
         this.rows[rowIndex].insertChar(char);
+    }
+    updateInputFocusAt(rowIndex)
+    {
+        this.rows[rowIndex].updateInputFocus();
     }
     removeCharFrom(rowIndex)
     {
@@ -334,11 +339,15 @@ class TileRow
     {
         const firstEmptyTile = this.tiles.find((t, i) => !t.hasChar);
         firstEmptyTile.char = char;
+
+        this.updateInputFocus();
     }
     removeChar()
     {
         const lastNonEmptyTile = this.tiles.slice().reverse().find((t, i) => t.hasChar);
         lastNonEmptyTile.char = null;
+
+        this.updateInputFocus();
     }
     setState(charStates)
     {
@@ -346,6 +355,18 @@ class TileRow
         {
             this.tiles[i].setState(charStates[i]);
         }
+
+        this.updateInputFocus();
+    }
+    clearInputFocus()
+    {
+        this.tiles.map(t => t.inputFocus = false);
+    }
+    updateInputFocus()
+    {
+        const indexOfFirstTileWithoutChar = this.tiles.findIndex(t => !t.hasChar);
+        this.tiles.map((t, i) => t.inputFocus = indexOfFirstTileWithoutChar == i);
+        console.log(indexOfFirstTileWithoutChar, this);
     }
     insertTilesIntoRow(wordLength)
     {
@@ -391,6 +412,21 @@ class Tile
         if(this.hasChar)
         {
             this.hostElement.classList.add('has-char');
+        }
+    }
+    get inputFocus()
+    {
+        return this.hostElement.classList.contains('input-focus');
+    }
+    set inputFocus(value)
+    {
+        if(value)
+        {
+            this.hostElement.classList.add('input-focus');
+        }
+        else
+        {
+            this.hostElement.classList.remove('input-focus');
         }
     }
 
@@ -738,6 +774,7 @@ class AttemptValidated extends GameStateChange
         // update tiles and keys
         gameBoard.setRowState(this.attempt.index, this.attempt.charStates);
         keyboard.setKeyStates(this.attempt.word, this.attempt.charStates);
+        gameBoard.updateInputFocusAt(this.game.activeAttempt.index);
 
         // show message if game is finished
         if(this.game.isFinished)
